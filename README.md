@@ -21,6 +21,6 @@
 **Timeline:**
 1. 1/14/22: Complete basic Client and Server connection, including forking off a Sub-Server to handle each individual Client.
 2. 1/17/22: Complete Client -> Sub-Server -> Main Server communication. Complete Main Server -> All Sub-Servers -> Clients communication.
-3. 1/19/22: Complete the two terminal setup for Clients (one to display incoming messages and one to send messages since the typing could be messed up if the incoming messages and printed while a person is typing on the terminal)
+3. 1/19/22: Complete the two terminal setup for Clients (one to display incoming messages and one to send messages since the typing could be messed up if the incoming messages are printed while a person is typing on the terminal)
 4. 1/21/22: Complete the name feature, where every message will display who sent a message.
 5. 1/23/22: Complete/make sure everything works correctly.
