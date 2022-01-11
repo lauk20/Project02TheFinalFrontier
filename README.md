@@ -6,7 +6,7 @@
 
 **Project Description:** A chat room/server that can handle multiple clients connecting. Each client should be able to send their own message and receive messages from others.
 
-**How the Project Will Be Used:** All interaction will happen through the terminal. Client sending and receiving messages will all appear on the terminal (though sending and receiving messages may need to be on different terminals). Creating the server and connecting to it will also be done through the terminal by running the C programs.
+**How the Project Will Be Used:** All interaction will happen through the terminal. Client sending and receiving messages will all appear on the terminal (though sending and receiving messages may need to be on different terminals). Creating the server and connecting to it will also be done through the terminal by running the C programs. One feature that it should contain is that every Client should be able to enter a name they want to go by when chatting.
 
 **Technical Design:**
 1. Topics covered in class that will be used: Networking concepts (sockets), Pipes (sub-server and server communication), Allocating memory, Processes (forking server/sub-server)
@@ -19,4 +19,8 @@
 4. Algorithms: I will be using the forking server model to handle client connections.
 
 **Timeline:**
-1. ??/??/??: Complete ?
+1. 1/14/22: Complete basic Client and Server connection, including forking off a Sub-Server to handle each individual Client.
+2. 1/17/22: Complete Client -> Sub-Server -> Main Server communication. Complete Main Server -> All Sub-Servers -> Clients communication.
+3. 1/19/22: Complete the two terminal setup for Clients (one to display incoming messages and one to send messages since the typing could be messed up if the incoming messages and printed while a person is typing on the terminal)
+4. 1/21/22: Complete the name feature, where every message will display who sent a message.
+5. 1/23/22: Complete/make sure everything works correctly.
