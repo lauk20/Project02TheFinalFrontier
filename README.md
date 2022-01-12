@@ -15,7 +15,7 @@
 - Sub-Server handling all communications with the Client and Main Server (read from Server, write to Server, read from Client, and write to Client)
 - Main Server will need to write to all Sub-Servers, which will need to send to all Clients.
 - Client displays message in a way that does not interfere with terminal typing/input.
-3. Data structures: SOCKETS to handle client and server/sub-server connection/communications. PIPES to handle sub-server and main server communication. MEMORY ALLOCATION to handle anything involving memory (such as strings/structs). FORK (sub-processes) to handle the sub-servers.
+3. Data structures: structs may be used to be used as the data being sent. The message struct should contain the client's name and message. Maybe an array to store all active connection file descriptors so that the server can write to all clients.
 4. Algorithms: I will be using the forking server model to handle client connections.
 
 **Timeline:**
@@ -23,4 +23,4 @@
 2. 1/17/22: Complete Client -> Sub-Server -> Main Server communication. Complete Main Server -> All Sub-Servers -> Clients communication.
 3. 1/19/22: Complete the two terminal setup for Clients (one to display incoming messages and one to send messages since the typing could be messed up if the incoming messages are printed while a person is typing on the terminal)
 4. 1/21/22: Complete the name feature, where every message will display who sent a message.
-5. 1/23/22: Complete/make sure everything works correctly.
+5. 1/23/22: Complete/make sure everything works correctly/make it so that the server/clients disconnect cleanly.
