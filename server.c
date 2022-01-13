@@ -41,14 +41,17 @@ int subserver_server(int client_socket, int pipe_read){
 }
 
 //send from subserver to main server
-int send_to_server(char * message, int pipe_write)){
+int send_to_server(char * message, int pipe_write){
   write(pipe_write, message, BUFFER_SIZE);
+  //printf("wrote to server\n");
 
   return 0;
 }
 
 //handles subserver communications between client
 int subserver_handler(int client_socket, int pipe_read, int pipe_write){
+  printf("Sub-Server created\n");
+
   char * message = calloc(BUFFER_SIZE, 1);
 
   int f = fork();
@@ -66,7 +69,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
       }
     }
   } else {
-    subserver_server(client_socket, pipe_read);
+    //subserver_server(client_socket, pipe_read);
   }
 
   exit(0);
@@ -75,32 +78,67 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
 //main server sets up subservers
 int main(){
   int listening_socket = server_create();
+  int subserver_read_pipes[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+  int subserver_write_pipes[10] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
+  fd_set read_descriptors;
 
   while(1){
-    int client_socket = server_accept();
+    FD_ZERO(&read_descriptors);
+    FD_SET(listening_socket, &read_descriptors);
 
-    int fds[2]; //SERVER READ
-    pipe(fds);
-
-    int fds2[2]; //SERVER WRITE
-    pipe(fds2);
-
-    int f = fork();
-
-    if (f == 0){ //subserver
-      close(fds[0]);
-      close(fds2[1]);
-      subserver_handler(client_socket, fds2[0], fds[1]);
-    } else { //main server
-      close(fds[1]);
-      close(fds2[0]);
-      close(client_socket);
-
-      f = fork();
-
-      if (f == 0){
-        send_to_all(pipe_read, pipe_write);
+    int max_descriptor = listening_socket;
+    int i = 0;
+    for (i = 0; i < 10; i++){
+      FD_SET(subserver_read_pipes[i], &read_descriptors);
+      //printf("set %d\n", subserver_read_pipes[i]);
+      if (subserver_read_pipes[i] > max_descriptor){
+        max_descriptor = subserver_read_pipes[i];
       }
     }
+
+    int s = select(max_descriptor + 1, &read_descriptors, NULL, NULL, NULL);
+
+    if (FD_ISSET(listening_socket, &read_descriptors)){
+      int client_socket = server_accept(listening_socket);
+
+      int fds[2]; //SERVER READ
+      pipe(fds);
+
+      int v = 0;
+      for (v = 0; v < 10; v++){
+        if (subserver_read_pipes[v] == -1){
+          subserver_read_pipes[v] = fds[0];
+          //printf("added %d\n", subserver_read_pipes[v]);
+          break;
+        }
+      }
+
+      int fds2[2]; //SERVER WRITE
+      pipe(fds2);
+
+      int f = fork();
+
+      if (f == 0){ //subserver
+        close(fds[0]);
+        close(fds2[1]);
+        subserver_handler(client_socket, fds2[0], fds[1]);
+      } else { //main server
+        close(fds[1]);
+        close(fds2[0]);
+        close(client_socket);
+      }
+    }
+
+    i = 0;
+    for (i = 0; i < 10; i++){
+      //printf("checking %d\n", subserver_read_pipes[i]);
+      if (subserver_read_pipes[i] != -1 && FD_ISSET(subserver_read_pipes[i], &read_descriptors)){
+        printf("Read from SubServer!\n");
+        char * message = calloc(BUFFER_SIZE, 1);
+        read(subserver_read_pipes[i], message, BUFFER_SIZE);
+      }
+    }
+
   }
 }
