@@ -14,9 +14,6 @@ int main(){
 
     write(socket, message, strlen(message));
 
-    read(socket, message, BUFFER_SIZE);
-    printf("%s\n", message);
-
     free(message);
   }
 }
