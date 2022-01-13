@@ -20,6 +20,12 @@ int server_setup() {
 
   listen(sd, 10);
 
+  int yes = 1;
+  if ( setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1 ) {
+    printf("sockopt  error\n");
+    exit(-1);
+  }
+
   free(hints);
   freeaddrinfo(results);
 
