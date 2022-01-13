@@ -1,0 +1,1 @@
+1/12/22 10:41 PM: Completed the very basic code the establish a connection between a Server and Client. Also worked on the Server's portion of code to handle the forking servers (sub-servers) using Pipes. Need to improve it so that the sub-server can read from both the client socket and the server pipe.
