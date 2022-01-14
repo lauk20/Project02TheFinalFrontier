@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "networking.h"
+#include <errno.h>
 
 //creates server socket and listens
 //returns listening socket
@@ -121,7 +122,10 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
 }
 
 int send_to_subserver(char * message, int pipe_write){
-  write(pipe_write, message, BUFFER_SIZE);
+  int w = write(pipe_write, message, BUFFER_SIZE);
+  printf("pw %d\n", pipe_write);
+  printf("%d aaa\n", w);
+  printf("%s\n", strerror(errno));
 
   return 0;
 }
@@ -130,7 +134,7 @@ int send_to_all(char * message, int pipes[10]){
   int i;
   for (i = 0; i < 10; i++){
     printf("%d\n", pipes[i]);
-    if (pipes[i] > -1){
+    if (pipes[i] > 0){
       send_to_subserver(message, pipes[i]);
     }
   }
@@ -181,7 +185,7 @@ int main(){
       v = 0;
       for (v = 0; v < 10; v++){
         if (subserver_write_pipes[v] == -1){
-          subserver_write_pipes[v] = fds2[0];
+          subserver_write_pipes[v] = fds2[1];
           //printf("added %d\n", subserver_read_pipes[v]);
           break;
         }
@@ -208,6 +212,9 @@ int main(){
         char * message = calloc(BUFFER_SIZE, 1);
         read(subserver_read_pipes[i], message, BUFFER_SIZE);
         printf("[%d] Server read from Sub-Server: %s\n", getpid(), message);
+        /*int w = write(subserver_write_pipes[i], message, BUFFER_SIZE);
+        pritnf("w: %d\n", w);
+        */
         send_to_all(message, subserver_write_pipes);
 
         free(message);
