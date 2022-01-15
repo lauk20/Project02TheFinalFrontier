@@ -16,15 +16,15 @@ int server_setup() {
   //create socket
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 
-  bind(sd, results->ai_addr, results->ai_addrlen);
-
-  listen(sd, 10);
-
   int yes = 1;
   if ( setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1 ) {
     printf("sockopt  error\n");
     exit(-1);
   }
+  
+  bind(sd, results->ai_addr, results->ai_addrlen);
+
+  listen(sd, 10);
 
   free(hints);
   freeaddrinfo(results);
