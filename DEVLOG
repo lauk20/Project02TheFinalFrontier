@@ -3,3 +3,4 @@
 1/14/22 ~11:45 AM: Fixed bug where the file descriptors were incorrectly used (used read pipe instead of write pipe).
 1/14/22 10:17 PM: Rewrote server.c in a way that uses select properly instead of keeping an array of file/pipe/socket descriptors. Next need to make client handle the message that sub-server sends.
 1/15/22 02:30 PM: Client can now receive messages from the Sub-Server. It also uses a pipe to send data to the Client Display, where messages are shown to the client.
+1/15/22 04:05 PM: Rewrote in a way that reads and write struct message_struct that has the "name" and "message" fields. Uses that struct instead of just a string now.
