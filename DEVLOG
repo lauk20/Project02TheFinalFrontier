@@ -1,2 +1,4 @@
 1/12/22 10:41 PM: Completed the very basic code the establish a connection between a Server and Client. Also worked on the Server's portion of code to handle the forking servers (sub-servers) using Pipes. Need to improve it so that the sub-server can read from both the client socket and the server pipe.
 1/13/22 11:43 AM: Completed establishing connection and reading from multiple pipes using select on Main Server. Started select functionality on Sub-Server.
+1/14/22 ~11:45 AM: Fixed bug where the file descriptors were incorrectly used (used read pipe instead of write pipe).
+14/22 10:17 PM: Rewrote server.c in a way that uses select properly instead of keeping an array of file/pipe/socket descriptors. Next need to make client handle the message that sub-server sends.
