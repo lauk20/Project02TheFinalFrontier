@@ -3,6 +3,11 @@
 #include "networking.h"
 #include <errno.h>
 
+struct message_struct {
+  char name[21];
+  char message[BUFFER_SIZE - 21];
+};
+
 //creates server socket and listens
 //returns listening socket
 int server_create(){
@@ -25,6 +30,7 @@ int send_to_client(int client_socket, char * message){
 
 //THIS FUNCTION ENDED UP NOT BEING USED
 //handles subserver communcations with main server
+/*
 int subserver_server(int client_socket, int pipe_read){
   char * message = calloc(BUFFER_SIZE, 1);
 
@@ -42,11 +48,13 @@ int subserver_server(int client_socket, int pipe_read){
 
   exit(0);
 }
+*/
 
 //send from subserver to main server
-int send_to_server(char * message, int pipe_write){
+int send_to_server(struct message_struct * message, int pipe_write){
   int w = write(pipe_write, message, BUFFER_SIZE);
   //printf("wrote to server %d\n", w);
+  free(message);
 
   return 0;
 }
@@ -54,10 +62,8 @@ int send_to_server(char * message, int pipe_write){
 //handles subserver communications between client
 int subserver_handler(int client_socket, int pipe_read, int pipe_write){
   printf("Sub-Server created\n");
-  if (errno){
-    printf("%s\n", strerror(errno));
-    exit(-1);
-  }
+
+  char * name = calloc(21, 1);
 
   fd_set read_descriptors;
 
@@ -89,8 +95,23 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
       int bytes_read = read(client_socket, message, BUFFER_SIZE);
 
       if (bytes_read != 0){
-        printf("[%d] Sub-Server has read from Client: %s\n", getpid(), message);
-        send_to_server(message, pipe_write);
+        if (strlen(name) == 0){
+          printf("[%d] Sub-Server has read NAME from Client: %s\n", getpid(), message);
+          strcpy(name, message);
+          printf("[%d] %s has joined the server\n", getpid(), name);
+          struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+          strcpy(message_data->name, "SERVER");
+          strcpy(message_data->message, message);
+          //printf("%s work\n", message_data->message);
+          strcat(message_data->message, " has joined the chat!");
+          send_to_server(message_data, pipe_write);
+        } else {
+          printf("[%d] Sub-Server has read from Client: %s\n", getpid(), message);
+          struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+          strcpy(message_data->name, name);
+          strcpy(message_data->message, message);
+          send_to_server(message_data, pipe_write);
+        }
       } else {
         printf("Client not connected\n");
         connected = 0;
@@ -99,20 +120,26 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
       free(message);
     } else {
       char * message = calloc(BUFFER_SIZE, 1);
-      int bytes_read = read(pipe_read, message, BUFFER_SIZE);
+      struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+      int bytes_read = read(pipe_read, message_data, BUFFER_SIZE);
       if (errno){
         printf("%s\n", strerror(errno));
         exit(-1);
       }
 
       if (bytes_read != 0){
-        printf("[%d] Sub-Server has read from Server: %s\n", getpid(), message);
+        printf("[%d] Sub-Server has read from Server: %s\n", getpid(), message_data->message);
+        strcat(message, "[");
+        strcat(message, message_data->name);
+        strcat(message, "] ");
+        strcat(message, message_data->message);
         send_to_client(client_socket, message);
       } else {
         //printf("Server not connected\n");
       }
 
       free(message);
+      free(message_data);
     }
   }
 
@@ -141,13 +168,13 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
   exit(0);
 }
 
-int send_to_subserver(char * message, int pipe_write){
+int send_to_subserver(struct message_struct * message, int pipe_write){
   int w = write(pipe_write, message, BUFFER_SIZE);
 
   return w;
 }
 
-int send_to_all(char * message, fd_set * write_set, int max){
+int send_to_all(struct message_struct * message, fd_set * write_set, int max){
   int i;
   for (i = 0; i <= max; i++){
     if (FD_ISSET(i, write_set)){
@@ -222,16 +249,19 @@ int main(){
     for (i = 0; i <= max_descriptor; i++){
       //printf("%d\n", i);
       if (FD_ISSET(i, &read_descriptors) && i != listening_socket){
-        char * message = calloc(BUFFER_SIZE, 1);
+        //char * message = calloc(BUFFER_SIZE, 1);
+        struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
 
-        if (read(i, message, BUFFER_SIZE)){
-          printf("[%d] Server read from Sub-Server: %s\n", getpid(), message);
-          send_to_all(message, &write_holder, max_descriptor);
+        if (read(i, message_data, BUFFER_SIZE)){
+          printf("[%d] Server read from Sub-Server: %s\n", getpid(), message_data->message);
+          send_to_all(message_data, &write_holder, max_descriptor);
         } else {
           FD_CLR(i, &read_holder);
           close(i);
           printf("closed\n");
         }
+
+        free(message_data);
       }
     }
 

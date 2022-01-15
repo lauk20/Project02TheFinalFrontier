@@ -5,6 +5,10 @@
 #include "networking.h"
 
 int main(){
+  char * name = calloc(21, 1);
+  printf("Name (<= 20 Characters): ");
+  fgets(name, 20, stdin);
+
   mkfifo("display", 0644);
 
   printf("Please run ./client_display to continue, it will display the chat messages. This program is responsible for sending messages\n");
@@ -34,6 +38,8 @@ int main(){
   fflush(stdin);
 
   int connected = 1;
+  *strchr(name, '\n') = 0;
+  write(socket, name, strlen(name));
   printf("Type Your Message: \n");
   while(connected){
     FD_ZERO(&read_descriptors);
