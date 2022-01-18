@@ -78,15 +78,6 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
   while(connected){
     FD_ZERO(&read_descriptors);
     FD_SET(client_socket, &read_descriptors);
-    if (errno){
-      printf("%1s\n", strerror(errno));
-      exit(-1);
-    }
-    FD_SET(pipe_read, &read_descriptors);
-    if (errno){
-      printf("%2s\n", strerror(errno));
-      exit(-1);
-    }
 
     int s = select(max_descriptor + 1, &read_descriptors, NULL, NULL, NULL);
 
@@ -122,10 +113,6 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
       char * message = calloc(BUFFER_SIZE, 1);
       struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
       int bytes_read = read(pipe_read, message_data, BUFFER_SIZE);
-      if (errno){
-        printf("%s\n", strerror(errno));
-        exit(-1);
-      }
 
       if (bytes_read != 0){
         printf("[%d] Sub-Server has read from Server: %s\n", getpid(), message_data->message);
@@ -164,7 +151,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
     //subserver_server(client_socket, pipe_read);
   }
   */
-
+  printf("exit 167\n");
   exit(0);
 }
 
@@ -204,6 +191,7 @@ int main(){
   int max_descriptor = listening_socket;
 
   while(1){
+    printf("PID: %d\n", getpid());
     FD_ZERO(&read_descriptors);
     FD_ZERO(&write_descriptors);
     read_descriptors = read_holder;
@@ -238,6 +226,7 @@ int main(){
         close(fds[0]);
         close(fds2[1]);
         subserver_handler(client_socket, fds2[0], fds[1]);
+        printf("it shouldn't get here\n");
       } else { //main server
         close(fds[1]);
         close(fds2[0]);
@@ -254,7 +243,9 @@ int main(){
 
         if (read(i, message_data, BUFFER_SIZE)){
           printf("[%d] Server read from Sub-Server: %s\n", getpid(), message_data->message);
+          printf("242\n");
           send_to_all(message_data, &write_holder, max_descriptor);
+          printf("247\n");
         } else {
           FD_CLR(i, &read_holder);
           close(i);
@@ -264,6 +255,7 @@ int main(){
         free(message_data);
       }
     }
+    printf("257\n");
 
     /*
     i = 0;
@@ -286,5 +278,6 @@ int main(){
 
   }
 
+  printf("return\n");
   return 0;
 }
