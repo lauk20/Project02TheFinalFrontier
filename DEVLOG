@@ -4,3 +4,5 @@
 1/14/22 10:17 PM: Rewrote server.c in a way that uses select properly instead of keeping an array of file/pipe/socket descriptors. Next need to make client handle the message that sub-server sends.
 1/15/22 02:30 PM: Client can now receive messages from the Sub-Server. It also uses a pipe to send data to the Client Display, where messages are shown to the client.
 1/15/22 04:05 PM: Rewrote in a way that reads and write struct message_struct that has the "name" and "message" fields. Uses that struct instead of just a string now.
+1/18/22 ~11:45 AM: Tested the program using the CS-LAB machines and found a bug where the Server would close itself when a Client disconnects and then reconnects. Tried to find the cause.
+1/18/22 09:04 PM: Found the cause of the bug and tried fixing it. Eventually found a simple solution that fixed it (added a new variable to the message struct to indicate commands from the Sub-Server to the Server, maybe even expandable to Client sent commands?).
