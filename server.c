@@ -114,7 +114,15 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
           send_to_server(message_data, pipe_write);
         }
       } else {
-        printf("Client not connected\n");
+        printf("[%d] Client not connected\n", getpid());
+        char * message = calloc(BUFFER_SIZE, 1);
+        struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+        strcpy(message, name);
+        strcat(message, " has disconnected.");
+        strcpy(message_data->name, "SERVER");
+        strcpy(message_data->message, message);
+        send_to_server(message_data, pipe_write);
+        free(message);
         connected = 0;
       }
 
@@ -266,7 +274,7 @@ int main(){
         } else {
           FD_CLR(i, &read_holder);
           close(i);
-          printf("closed\n");
+          //printf("closed\n");
         }
 
         //free(message_data);
