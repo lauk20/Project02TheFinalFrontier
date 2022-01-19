@@ -4,7 +4,12 @@
 #include <fcntl.h>
 #include "networking.h"
 
-int main(){
+int main(int argc, char ** args){
+  char * address = calloc(16, 1);
+  strcpy(address, "127.0.0.1");
+  if (argc > 1){
+    strcpy(address, args[1]);
+  }
   char * name = calloc(21, 1);
   printf("Name (<= 20 Characters): ");
   fgets(name, 20, stdin);
@@ -19,7 +24,7 @@ int main(){
 
   int socket;
 
-  socket = client_connect();
+  socket = client_connect(address);
 
   fd_set read_descriptors;
   fd_set read_holder;

@@ -21,7 +21,7 @@ int server_setup() {
     printf("sockopt  error\n");
     exit(-1);
   }
-  
+
   bind(sd, results->ai_addr, results->ai_addrlen);
 
   listen(sd, 10);
@@ -44,13 +44,13 @@ int server_connect(int sd) {
 }
 
 //returns socket descriptor for client
-int client_connect() {
+int client_connect(char * address) {
 
   struct addrinfo * hints, * results;
   hints = calloc(1, sizeof(struct addrinfo));
   hints->ai_family = AF_INET;
   hints->ai_socktype = SOCK_STREAM;
-  getaddrinfo("127.0.0.1", "25932", hints, &results);
+  getaddrinfo(address, "25932", hints, &results);
 
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 
