@@ -6,3 +6,4 @@
 1/15/22 04:05 PM: Rewrote in a way that reads and write struct message_struct that has the "name" and "message" fields. Uses that struct instead of just a string now.
 1/18/22 ~11:45 AM: Tested the program using the CS-LAB machines and found a bug where the Server would close itself when a Client disconnects and then reconnects. Tried to find the cause.
 1/18/22 09:04 PM: Found the cause of the bug and tried fixing it. Eventually found a simple solution that fixed it (added a new variable to the message struct to indicate commands from the Sub-Server to the Server, maybe even expandable to Client sent commands?).
+1/19/22 11:37 AM: Changed/added the/a disconnect message when a client disconnects. Made so that the client can now connect to a specific address using "./client [address here]".
