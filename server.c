@@ -5,7 +5,8 @@
 
 struct message_struct {
   char name[21];
-  char message[BUFFER_SIZE - 21];
+  char message[BUFFER_SIZE - 21 - sizeof(int)];
+  int type; //0 for message anything else for a signal.
 };
 
 //creates server socket and listens
@@ -152,11 +153,18 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
   }
   */
   printf("exit 167\n");
-  exit(0);
+  struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+  message_data->type = pipe_read + 1;
+  printf("type: %d\n", pipe_read);
+  send_to_server(message_data, pipe_write);
+  exit(pipe_read);
 }
 
 int send_to_subserver(struct message_struct * message, int pipe_write){
+  printf("before\n");
+  printf("pipe_write: %d\n", pipe_write);
   int w = write(pipe_write, message, BUFFER_SIZE);
+  printf("after\n");
 
   return w;
 }
@@ -215,6 +223,7 @@ int main(){
       int fds2[2]; //SERVER WRITE
       pipe(fds2);
       FD_SET(fds2[1], &write_holder);
+      printf("added: %d\n", fds2[1]);
 
       if (fds2[1] > max_descriptor){
         max_descriptor = fds2[1];
@@ -244,7 +253,13 @@ int main(){
         if (read(i, message_data, BUFFER_SIZE)){
           printf("[%d] Server read from Sub-Server: %s\n", getpid(), message_data->message);
           printf("242\n");
-          send_to_all(message_data, &write_holder, max_descriptor);
+          if (message_data->type == 0){
+            send_to_all(message_data, &write_descriptors, max_descriptor);
+          } else {
+            printf("clearing %d\n", message_data->type);
+            FD_CLR(message_data->type, &write_holder);
+            FD_CLR(message_data->type, &write_descriptors);
+          }
           printf("247\n");
         } else {
           FD_CLR(i, &read_holder);
