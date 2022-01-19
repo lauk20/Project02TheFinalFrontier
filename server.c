@@ -6,7 +6,7 @@
 struct message_struct {
   char name[21];
   char message[BUFFER_SIZE - 21 - sizeof(int)];
-  int type; //0 for message anything else for a signal.
+  int type;
 };
 
 //creates server socket and listens
@@ -61,7 +61,7 @@ int send_to_server(struct message_struct * message, int pipe_write){
 }
 
 //handles subserver communications between client
-int subserver_handler(int client_socket, int pipe_read, int pipe_write){
+int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_close){
   printf("Sub-Server created\n");
 
   char * name = calloc(21, 1);
@@ -79,6 +79,15 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
   while(connected){
     FD_ZERO(&read_descriptors);
     FD_SET(client_socket, &read_descriptors);
+    if (errno){
+      printf("%1s\n", strerror(errno));
+      exit(-1);
+    }
+    FD_SET(pipe_read, &read_descriptors);
+    if (errno){
+      printf("%2s\n", strerror(errno));
+      exit(-1);
+    }
 
     int s = select(max_descriptor + 1, &read_descriptors, NULL, NULL, NULL);
 
@@ -114,6 +123,10 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
       char * message = calloc(BUFFER_SIZE, 1);
       struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
       int bytes_read = read(pipe_read, message_data, BUFFER_SIZE);
+      if (errno){
+        printf("%s\n", strerror(errno));
+        exit(-1);
+      }
 
       if (bytes_read != 0){
         printf("[%d] Sub-Server has read from Server: %s\n", getpid(), message_data->message);
@@ -152,19 +165,14 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write){
     //subserver_server(client_socket, pipe_read);
   }
   */
-  printf("exit 167\n");
   struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
-  message_data->type = pipe_read + 1;
-  printf("type: %d\n", pipe_read);
+  message_data->type = to_close;
   send_to_server(message_data, pipe_write);
-  exit(pipe_read);
+  exit(0);
 }
 
 int send_to_subserver(struct message_struct * message, int pipe_write){
-  printf("before\n");
-  printf("pipe_write: %d\n", pipe_write);
   int w = write(pipe_write, message, BUFFER_SIZE);
-  printf("after\n");
 
   return w;
 }
@@ -199,7 +207,6 @@ int main(){
   int max_descriptor = listening_socket;
 
   while(1){
-    printf("PID: %d\n", getpid());
     FD_ZERO(&read_descriptors);
     FD_ZERO(&write_descriptors);
     read_descriptors = read_holder;
@@ -223,7 +230,6 @@ int main(){
       int fds2[2]; //SERVER WRITE
       pipe(fds2);
       FD_SET(fds2[1], &write_holder);
-      printf("added: %d\n", fds2[1]);
 
       if (fds2[1] > max_descriptor){
         max_descriptor = fds2[1];
@@ -234,8 +240,7 @@ int main(){
       if (f == 0){ //subserver
         close(fds[0]);
         close(fds2[1]);
-        subserver_handler(client_socket, fds2[0], fds[1]);
-        printf("it shouldn't get here\n");
+        subserver_handler(client_socket, fds2[0], fds[1], fds2[1]);
       } else { //main server
         close(fds[1]);
         close(fds2[0]);
@@ -252,25 +257,21 @@ int main(){
 
         if (read(i, message_data, BUFFER_SIZE)){
           printf("[%d] Server read from Sub-Server: %s\n", getpid(), message_data->message);
-          printf("242\n");
           if (message_data->type == 0){
-            send_to_all(message_data, &write_descriptors, max_descriptor);
+            send_to_all(message_data, &write_holder, max_descriptor);
           } else {
-            printf("clearing %d\n", message_data->type);
-            FD_CLR(message_data->type, &write_holder);
             FD_CLR(message_data->type, &write_descriptors);
+            FD_CLR(message_data->type, &write_holder);
           }
-          printf("247\n");
         } else {
           FD_CLR(i, &read_holder);
           close(i);
           printf("closed\n");
         }
 
-        free(message_data);
+        //free(message_data);
       }
     }
-    printf("257\n");
 
     /*
     i = 0;
@@ -293,6 +294,5 @@ int main(){
 
   }
 
-  printf("return\n");
   return 0;
 }
