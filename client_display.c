@@ -7,7 +7,8 @@
 int main(){
   int fd = open("display", O_RDONLY, 0644);
 
-  if (fd){
+  if (fd > -1){
+    remove("display");
     int connected = 1;
     while (connected){
       char * message = calloc(BUFFER_SIZE, 1);
