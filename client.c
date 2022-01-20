@@ -15,10 +15,12 @@ int main(int argc, char ** args){
   fgets(name, 20, stdin);
 
   mkfifo("display", 0644);
+  mkfifo("readDisplay", 0644);
 
   printf("Please run ./client_display to continue, it will display the chat messages. This program is responsible for sending messages\n");
 
   int fdwrite = open("display", O_WRONLY, 0644);
+  int fdread = open("readDisplay", O_RDONLY, 0644);
 
   printf("Client Display has been opened\n");
 
@@ -39,6 +41,7 @@ int main(int argc, char ** args){
   FD_ZERO(&read_holder);
   FD_SET(socket, &read_holder);
   FD_SET(STDIN_FILENO, &read_holder);
+  FD_SET(fdread, &read_holder);
 
   fflush(stdin);
 
@@ -62,13 +65,14 @@ int main(int argc, char ** args){
       write(socket, message, strlen(message));
 
       free(message);
-    } else {
+    } else if (FD_ISSET(socket, &read_holder)){
       char * message = calloc(BUFFER_SIZE, 1);
       int r = read(socket, message, BUFFER_SIZE);
 
       if (r){
+        printf("here2\n");
         int w = write(fdwrite, message, BUFFER_SIZE);
-
+        printf("here\n");
         if (w == 0){
           connected = 0;
         }
@@ -77,6 +81,12 @@ int main(int argc, char ** args){
       }
 
       free(message);
+    } else {
+      printf("asdf\n");
+      char * message = calloc(BUFFER_SIZE, 1);
+      int r = read(fdread, message, BUFFER_SIZE);
+
+      printf("Chat Display has been closed, disconnecting...\n");
     }
   }
 }

@@ -6,9 +6,11 @@
 
 int main(){
   int fd = open("display", O_RDONLY, 0644);
+  int fdwrite = open("readDisplay", O_WRONLY, 0644);
 
   if (fd > -1){
     remove("display");
+    remove("readDisplay");
     int connected = 1;
     while (connected){
       char * message = calloc(BUFFER_SIZE, 1);
