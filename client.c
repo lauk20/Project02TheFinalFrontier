@@ -47,6 +47,7 @@ int main(int argc, char ** args){
 
   int connected = 1;
   *strchr(name, '\n') = 0;
+  printf("question\n");
   write(socket, name, strlen(name));
   printf("Type Your Message: \n");
   while(connected){
