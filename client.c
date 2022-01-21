@@ -65,15 +65,15 @@ int main(int argc, char ** args){
     } else {
       char * message = calloc(BUFFER_SIZE, 1);
       int r = read(socket, message, BUFFER_SIZE);
-
       if (r){
         int w = write(fdwrite, message, BUFFER_SIZE);
-
         if (w == 0){
           connected = 0;
+          printf("Client Display was closed\n");
         }
       } else {
         connected = 0;
+        printf("Disconnected from Server\n");
       }
 
       free(message);
