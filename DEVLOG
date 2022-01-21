@@ -7,3 +7,5 @@
 1/18/22 ~11:45 AM: Tested the program using the CS-LAB machines and found a bug where the Server would close itself when a Client disconnects and then reconnects. Tried to find the cause.
 1/18/22 09:04 PM: Found the cause of the bug and tried fixing it. Eventually found a simple solution that fixed it (added a new variable to the message struct to indicate commands from the Sub-Server to the Server, maybe even expandable to Client sent commands?).
 1/19/22 11:37 AM: Changed/added the/a disconnect message when a client disconnects. Made so that the client can now connect to a specific address using "./client [address here]".
+1/20/22 ~11:45 AM: Fixed bug where the client display would go into an infinite lop if it was run before the client. Worked on getting the client process to end when the client_display process ends.
+1/20/22: 09:43 PM: Continued to work on getting the client program to end when the client display process ends.
