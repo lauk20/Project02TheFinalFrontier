@@ -9,6 +9,9 @@ server: server.o networking.o
 client.o: client.c
 	gcc -c client.c
 
+server.o: server.c
+	gcc -c server.c
+
 networking.o: networking.c networking.h
 	gcc -c networking.c
 
