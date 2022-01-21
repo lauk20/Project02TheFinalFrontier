@@ -115,8 +115,12 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
         }
       } else {
         printf("[%d] Client not connected\n", getpid());
-        char * message = calloc(BUFFER_SIZE, 1);
         struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+        message_data->type = to_close;
+        send_to_server(message_data, pipe_write);
+
+        char * message = calloc(BUFFER_SIZE, 1);
+        message_data = calloc(sizeof(struct message_struct), 1);
         strcpy(message, name);
         strcat(message, " has disconnected.");
         strcpy(message_data->name, "SERVER");
@@ -264,7 +268,7 @@ int main(){
         struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
 
         if (read(i, message_data, BUFFER_SIZE)){
-          printf("[%d] Server read from Sub-Server: %s\n", getpid(), message_data->message);
+          printf("[%d] Server read from Sub-Server: %s Type: %d\n", getpid(), message_data->message, message_data->type);
           if (message_data->type == 0){
             send_to_all(message_data, &write_holder, max_descriptor);
           } else {
