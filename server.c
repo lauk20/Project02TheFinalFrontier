@@ -86,7 +86,7 @@ int loopback_verify(char * address){
 
 //handles subserver communications between client
 int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_close, char * address){
-  printf("Sub-Server created\n");
+  printf("Sub-Server created for Client: %s\n", address);
 
   char * name = calloc(21, 1);
 
@@ -292,7 +292,7 @@ int main(){
       char address_string[30];
       inet_ntop(AF_INET, &ip, address_string, 30);
 
-      printf("ip: %s\n", address_string);
+      //printf("ip: %s\n", address_string);
 
       int fds[2]; //SERVER READ
       pipe(fds);
