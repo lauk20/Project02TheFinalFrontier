@@ -13,4 +13,5 @@
 1/21/22: 09:08 PM: Added the "/kick [user]" command. The command can be used in the chat by to kick anyone from the chat by using their username (example: "/kick user"). Currently must be typed exactly in the format "/kick user". It can also be used by anyone currently.
 1/22/22: 01:15 PM: Adjusted the networking.c functions to allow for the Server to know the address of the connecting Client.
 1/22/22: 01:53 PM: Added feature where only Clients that are on the same machine as the Server can have special permissions to kick other users using the "/kick user" command.
-1/22/22: 5:30 PM: Added mute command. Clients can be muted, can read chats but cannot send chats. "/mute user".
+1/22/22: 05:30 PM: Added mute command. Clients can be muted, can read chats but cannot send chats. "/mute user".
+1/22/22: 06:04 PM: Clients that use spaces in their names will now have the spaces replaced with dashes (-) in order to make them compatible with the kick and mute commands.
