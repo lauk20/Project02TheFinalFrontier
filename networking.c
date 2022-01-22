@@ -2,6 +2,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 
 //returns socket descriptor for server
@@ -25,6 +27,9 @@ int server_setup() {
   bind(sd, results->ai_addr, results->ai_addrlen);
 
   listen(sd, 10);
+
+  struct sockaddr_in * addr_in = (struct sockaddr_in *)(results->ai_addr);
+  printf("Server has been started on: %s\n", inet_ntoa(addr_in->sin_addr));
 
   free(hints);
   freeaddrinfo(results);
