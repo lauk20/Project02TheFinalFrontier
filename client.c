@@ -26,8 +26,10 @@ int main(int argc, char ** args){
 
   socket = client_connect(address);
 
+  printf("socket %d\n", socket);
+
   if (socket < 0){
-    printf("Error Connecting to Server. If you are not on the same machine as the Server, please run \"./client [SERVER ADDRESS HERE]\", replacing \"SERVER ADDRESS HERE\" with the Server's address and removing the brackets.")
+    printf("Error Connecting to Server. If you are not on the same machine as the Server, please run \"./client [SERVER ADDRESS HERE]\", replacing \"SERVER ADDRESS HERE\" with the Server's address and removing the brackets.");
   }
 
   fd_set read_descriptors;
