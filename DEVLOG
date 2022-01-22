@@ -9,3 +9,5 @@
 1/19/22 11:37 AM: Changed/added the/a disconnect message when a client disconnects. Made so that the client can now connect to a specific address using "./client [address here]".
 1/20/22 ~11:45 AM: Fixed bug where the client display would go into an infinite lop if it was run before the client. Worked on getting the client process to end when the client_display process ends.
 1/20/22: 09:43 PM: Continued to work on getting the client program to end when the client display process ends.
+1/21/22: ~11:45 AM: Found another way to break the Server by disconnecting the Client twice. Fixed the bug as far as testing goes.
+1/21/22: 09:08 PM: Added the "/kick [user]" command. The command can be used in the chat by to kick anyone from the chat by using their username (example: "/kick user"). Currently must be typed exactly in the format "/kick user". It can also be used by anyone currently.
