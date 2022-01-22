@@ -22,7 +22,7 @@ List of Commands:
 /kick username
 /mute username
 ```
-If you are connecting a Client to a Server using the machine that is running the Server, you will have special Permissions to **kick** or **mute** a user from the chat. The commands must be typed exactly like this in the ```./client``` terminal: ```/kick username``` (no extra spaces and must be the target's exact username). (Type it in the same place you would type a normal message to send to the Server). Same applies for mute: ```/mute username```
+If you are connecting a Client to a Server using the machine that is running the Server, you will have special Permissions to **kick** or **mute** a user from the chat. To receive these permissions, you must also run the client program using the default loopback address: ```./client``` will automatically do that for you. The commands must be typed exactly like this in the ```./client``` terminal: ```/kick username``` (no extra spaces and must be the target's exact username). (Type it in the same place you would type a normal message to send to the Server). Same applies for mute: ```/mute username```
 
 **Concepts Used**
 1. Allocating Memory (Allocated memory for structs/strings)
