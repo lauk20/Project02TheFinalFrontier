@@ -1,4 +1,31 @@
 # Project02TheFinalFrontier
+## DOCUMENTATION ##
+
+**Project Name:** C-hat
+
+**Team Members and Class Period:** Kenny Lau, Period 5
+
+**Broad Description of Project:** A chat server that can handle multiple clients at the same time.
+
+**List of Any Required Libraries:** NONE
+
+**Instructions to Run:**
+1. Run ```make``` to compile the code.
+2. Run ```./server``` to start the Server. The Server will start on the machine that you are running this command on. The Server process will print information about what each Process/Sub-process (sub-server) has read from the Client or Main Server.
+3. Running the Clients:
+- IF you wish to run a Client on the same machine as the Server *which would give it special permissions to kick other Clients (see 5)*. In a *NEW* terminal, please run ```./client```, which will connect to the default address: 127.0.0.1. Next, you should be prompted for a username, that is <= 20 Characters long. After that, you will be asked to run ```./client_display```; also do this in a *NEW* terminal.
+- IF you are connecting to the Server from a different machine, run ```./client [SERVER ADDRESS]```. Example: if the Server were started on cslab1-19, you would run ```./client 149.XX.XXX.119``` (REPLACE the X's with the ACTUAL NUMBERS, removed them here in case it shouldn't be on a public Github repo). Now that the Client program has started, you will be asked for a username <= 20 Characters, enter that and it will ask you to run ```./client_display```. Once all that is done, you can now send messages to the Server.
+4. Seeing the Messages: Every Client should have 2 terminal windows: one for ```./client``` and one for ```./client_display```. This is because the ```./client``` one is used to send messages while the ```./client_display``` one is used to receive and print messages.
+5. Clients with Special Permissions: If you are connecting a Client to a Server using a machine that is running a Server, you will have special Permissions to kick a user from the chat. The command must be typed exactly like this in the ```./client``` terminal: ```/kick username``` (no extra spaces and must be the target's exact username). (Type it in the same place you would type a normal message to send to the Server).
+
+**Concepts Used**
+1. Allocating Memory (Allocated memory for structs/strings)
+2. Processes (Main Server forking off Sub-Servers to handle individual Clients).
+3. Pipes (Both Named and Unnamed: Named Pipe for ./client to send messages for ./client_display to display to the user. Unnamed Pipes that connect each Sub-Server to the Main Server).
+4. Sockets (Sockets used for the Client and Sub-Server and Server to communicate on different machines).
+
+
+## PROPOSAL ##
 
 **Members:** Kenny Lau
 
