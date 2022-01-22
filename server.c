@@ -154,7 +154,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
             if (strcmp(cmd, "kick") == 0 && loopback_verify(address)){
               server_kick(target, pipe_write);
             } else if (strcmp(cmd, "mute") == 0 && loopback_verify(address)){
-              printf("mute\n");
+              //printf("mute\n");
               server_mute(target, pipe_write);
             }
             free(target);
@@ -219,7 +219,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
           }
         } else if (message_data->type == -2){
           if (strcmp(name, message_data->message) == 0){
-            printf("muted\n");
+            //printf("muted\n");
             muted = 1;
             free(message_data);
             message_data = calloc(sizeof(struct message_struct), 1);
