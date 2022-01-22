@@ -55,7 +55,7 @@ int main(int argc, char ** args){
     if (FD_ISSET(STDIN_FILENO, &read_descriptors)){
       char * message = calloc(BUFFER_SIZE, 1);
       printf("Type Your Message: \n");
-      fgets(message, BUFFER_SIZE, stdin);
+      fgets(message, BUFFER_SIZE - 21 - sizeof(int), stdin);
 
       *strchr(message, '\n') = 0;
 
