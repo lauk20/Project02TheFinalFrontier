@@ -76,7 +76,7 @@ int server_kick(char * target, int pipe_write){
 
 int loopback_verify(char * address){
   if (strlen(address) > 2){
-    if (address[0] == '1' && address[1] == '2' && address[3] == '7'){
+    if (address[0] == '1' && address[1] == '2' && address[2] == '7'){
       return 1;
     }
   }
