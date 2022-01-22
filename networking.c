@@ -28,8 +28,17 @@ int server_setup() {
 
   listen(sd, 10);
 
+  char host[256];
+  int hostname;
+  struct hostent * host_entry;
+  hostname = gethostname(host, sizeof(host));
+  host_entry = gethostbyname(host);
+  printf("Server has been started on: %s\n", inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[0])));
+
+  /*
   struct sockaddr_in * addr_in = (struct sockaddr_in *)(results->ai_addr);
   printf("Server has been started on: %s\n", inet_ntoa(addr_in->sin_addr));
+  */
 
   free(hints);
   freeaddrinfo(results);
