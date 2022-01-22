@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "networking.h"
 #include <errno.h>
+#include "commands.h"
 
 struct message_struct {
   char name[21];
@@ -60,6 +61,17 @@ int send_to_server(struct message_struct * message, int pipe_write){
   return 0;
 }
 
+int server_kick(char * target, int pipe_write){
+  struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+  strcpy(message_data->name, "SERVER");
+  strcpy(message_data->message, target);
+  //printf("%s work\n", message_data->message);
+  message_data->type = -1;
+  send_to_server(message_data, pipe_write);
+
+  return 0;
+}
+
 //handles subserver communications between client
 int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_close){
   printf("Sub-Server created\n");
@@ -108,10 +120,24 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
           send_to_server(message_data, pipe_write);
         } else {
           printf("[%d] Sub-Server has read from Client: %s\n", getpid(), message);
-          struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
-          strcpy(message_data->name, name);
-          strcpy(message_data->message, message);
-          send_to_server(message_data, pipe_write);
+          if (strlen(message) > 0 && message[0] == '/'){
+            char cmd[10];
+            char * target = calloc(10, 1);
+            message = message + 1;
+
+            sscanf(message, "%s %s", cmd, target);
+
+            if (strcmp(cmd, "kick") == 0){
+              server_kick(target, pipe_write);
+            }
+            free(target);
+            printf("134\n");
+          } else {
+            struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+            strcpy(message_data->name, name);
+            strcpy(message_data->message, message);
+            send_to_server(message_data, pipe_write);
+          }
         }
       } else {
         printf("[%d] Client not connected\n", getpid());
@@ -130,7 +156,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
         connected = 0;
       }
 
-      free(message);
+      //free(message);
     } else {
       char * message = calloc(BUFFER_SIZE, 1);
       struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
@@ -141,12 +167,29 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
       }
 
       if (bytes_read != 0){
-        printf("[%d] Sub-Server has read from Server: %s\n", getpid(), message_data->message);
-        strcat(message, "[");
-        strcat(message, message_data->name);
-        strcat(message, "] ");
-        strcat(message, message_data->message);
-        send_to_client(client_socket, message);
+        printf("[%d] Sub-Server has read from Server: %s Type: %d\n", getpid(), message_data->message, message_data->type);
+        if (message_data->type == -1){
+          if (strcmp(name, message_data->message) == 0){
+            free(message_data);
+            message_data = calloc(sizeof(struct message_struct), 1);
+            message_data->type = to_close;
+            send_to_server(message_data, pipe_write);
+            message_data = calloc(sizeof(struct message_struct), 1);
+            strcpy(message, name);
+            strcat(message, " has been kicked.");
+            strcpy(message_data->name, "SERVER");
+            strcpy(message_data->message, message);
+            send_to_server(message_data, pipe_write);
+            connected = 0;
+            break;
+          }
+        } else {
+          strcat(message, "[");
+          strcat(message, message_data->name);
+          strcat(message, "] ");
+          strcat(message, message_data->message);
+          send_to_client(client_socket, message);
+        }
       } else {
         //printf("Server not connected\n");
       }
@@ -269,7 +312,7 @@ int main(){
 
         if (read(i, message_data, BUFFER_SIZE)){
           printf("[%d] Server read from Sub-Server: %s Type: %d\n", getpid(), message_data->message, message_data->type);
-          if (message_data->type == 0){
+          if (message_data->type == 0 || message_data->type == -1){
             send_to_all(message_data, &write_holder, max_descriptor);
           } else {
             FD_CLR(message_data->type, &write_descriptors);
