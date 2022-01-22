@@ -74,8 +74,18 @@ int server_kick(char * target, int pipe_write){
   return 0;
 }
 
+int loopback_verify(char * address){
+  if (strlen(address) > 2){
+    if (address[0] == '1' && address[1] == '2' && address[3] == '7'){
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 //handles subserver communications between client
-int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_close){
+int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_close, char * address){
   printf("Sub-Server created\n");
 
   char * name = calloc(21, 1);
@@ -129,7 +139,7 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
 
             sscanf(message, "%s %s", cmd, target);
 
-            if (strcmp(cmd, "kick") == 0){
+            if (strcmp(cmd, "kick") == 0 && loopback_verify(address)){
               server_kick(target, pipe_write);
             }
             free(target);
@@ -305,7 +315,7 @@ int main(){
       if (f == 0){ //subserver
         close(fds[0]);
         close(fds2[1]);
-        subserver_handler(client_socket, fds2[0], fds[1], fds2[1]);
+        subserver_handler(client_socket, fds2[0], fds[1], fds2[1], address_string);
       } else { //main server
         close(fds[1]);
         close(fds2[0]);
