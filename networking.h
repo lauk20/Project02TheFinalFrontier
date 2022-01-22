@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/socket.h>
 
 #ifndef NETWORKING_H
 #define NETWORKING_H
@@ -17,7 +18,7 @@
 
 //for forking server
 int server_setup();
-int server_connect(int sd);
+int server_connect(int sd, struct sockaddr_storage * client_address);
 
 
 int client_connect();

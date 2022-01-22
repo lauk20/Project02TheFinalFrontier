@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include "networking.h"
 #include <errno.h>
-#include "commands.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 struct message_struct {
   char name[21];
@@ -18,8 +20,8 @@ int server_create(){
 
 //accepts connections
 //returns client socket created by accept
-int server_accept(int listening_socket){
-  return server_connect(listening_socket);
+int server_accept(int listening_socket, struct sockaddr_storage * client_address){
+  return server_connect(listening_socket, client_address);
 }
 
 //sends from subserver to client
@@ -131,7 +133,6 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
               server_kick(target, pipe_write);
             }
             free(target);
-            printf("134\n");
           } else {
             struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
             strcpy(message_data->name, name);
@@ -272,7 +273,16 @@ int main(){
     int s = select(max_descriptor + 1, &read_descriptors, NULL, NULL, NULL);
 
     if (FD_ISSET(listening_socket, &read_descriptors)){
-      int client_socket = server_accept(listening_socket);
+      struct sockaddr_storage client_address;
+      int client_socket = server_accept(listening_socket, &client_address);
+
+      struct sockaddr_in * addr = (struct sockaddr_in *)&client_address;
+      struct in_addr ip = addr->sin_addr;
+
+      char address_string[30];
+      inet_ntop(AF_INET, &ip, address_string, 30);
+
+      printf("ip: %s\n", address_string);
 
       int fds[2]; //SERVER READ
       pipe(fds);

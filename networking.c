@@ -33,12 +33,12 @@ int server_setup() {
 }
 
 //returns client_socket created by accept()
-int server_connect(int sd) {
+int server_connect(int sd, struct sockaddr_storage * client_address) {
   int client_socket;
   socklen_t sock_size;
-  struct sockaddr_storage client_address;
+  //struct sockaddr_storage client_address;
   sock_size = sizeof(client_address);
-  client_socket = accept(sd, (struct sockaddr *) &client_address, &sock_size);
+  client_socket = accept(sd, (struct sockaddr *) client_address, &sock_size);
 
   return client_socket;
 }
