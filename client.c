@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "networking.h"
+#include <errno.h>
 
 int main(int argc, char ** args){
   char * address = calloc(16, 1);
@@ -26,9 +27,7 @@ int main(int argc, char ** args){
 
   socket = client_connect(address);
 
-  printf("socket %d\n", socket);
-
-  if (socket < 0){
+  if (errno){
     printf("Error Connecting to Server. If you are not on the same machine as the Server, please run \"./client [SERVER ADDRESS HERE]\", replacing \"SERVER ADDRESS HERE\" with the Server's address and removing the brackets.");
   }
 

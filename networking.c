@@ -68,7 +68,11 @@ int client_connect(char * address) {
 
   int sd = socket(results->ai_family, results->ai_socktype, results->ai_protocol);
 
-  connect(sd, results->ai_addr, results->ai_addrlen);
+  int con = connect(sd, results->ai_addr, results->ai_addrlen);
+
+  if (con < 0){
+    return con;
+  }
 
   free(hints);
   freeaddrinfo(results);
