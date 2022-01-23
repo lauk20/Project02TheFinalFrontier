@@ -74,6 +74,17 @@ int server_mute(char * target, int pipe_write){
   return 0;
 }
 
+int server_unmute(char * target, int pipe_write){
+  struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
+  strcpy(message_data->name, "SERVER");
+  strcpy(message_data->message, target);
+  //printf("%s work\n", message_data->message);
+  message_data->type = -3;
+  send_to_server(message_data, pipe_write);
+
+  return 0;
+}
+
 int server_kick(char * target, int pipe_write){
   struct message_struct * message_data = calloc(sizeof(struct message_struct), 1);
   strcpy(message_data->name, "SERVER");
@@ -156,6 +167,8 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
             } else if (strcmp(cmd, "mute") == 0 && loopback_verify(address)){
               //printf("mute\n");
               server_mute(target, pipe_write);
+            } else if (strcmp(cmd, "unmute") == 0 && loopback_verify(address)){
+              server_unmute(target, pipe_write);
             }
             free(target);
           } else if (muted){
@@ -218,13 +231,26 @@ int subserver_handler(int client_socket, int pipe_read, int pipe_write, int to_c
             break;
           }
         } else if (message_data->type == -2){
-          if (strcmp(name, message_data->message) == 0){
+          if (strcmp(name, message_data->message) == 0 && muted == 0){
             //printf("muted\n");
             muted = 1;
             free(message_data);
             message_data = calloc(sizeof(struct message_struct), 1);
             strcpy(message, name);
             strcat(message, " has been muted.");
+            strcpy(message_data->name, "SERVER");
+            strcpy(message_data->message, message);
+            send_to_server(message_data, pipe_write);
+            continue;
+          }
+        } else if (message_data-> type == -3){
+          if (strcmp(name, message_data->message) == 0 && muted){
+            //printf("muted\n");
+            muted = 0;
+            free(message_data);
+            message_data = calloc(sizeof(struct message_struct), 1);
+            strcpy(message, name);
+            strcat(message, " has been unmuted.");
             strcpy(message_data->name, "SERVER");
             strcpy(message_data->message, message);
             send_to_server(message_data, pipe_write);
@@ -368,7 +394,7 @@ int main(){
 
         if (read(i, message_data, BUFFER_SIZE)){
           printf("[%d] Server read from Sub-Server: %s Type: %d\n", getpid(), message_data->message, message_data->type);
-          if (message_data->type == 0 || message_data->type == -1 || message_data->type == -2){
+          if (message_data->type == 0 || message_data->type == -1 || message_data->type == -2 || message_data->type == -3){
             send_to_all(message_data, &write_holder, max_descriptor);
           } else {
             FD_CLR(message_data->type, &write_descriptors);
