@@ -43,7 +43,7 @@ int main(int argc, char ** args){
 
   socket = client_connect(address);
 
-  if (errno || socket < 0){
+  if (socket < 0){
     printf("Error Connecting to Server. If you are not on the same machine as the Server, please run \"./client [SERVER ADDRESS HERE]\", replacing \"SERVER ADDRESS HERE\" with the Server's address and removing the brackets.\n");
     return -1;
   }
