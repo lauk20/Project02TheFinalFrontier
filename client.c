@@ -12,8 +12,15 @@ int main(int argc, char ** args){
     strcpy(address, args[1]);
   }
   char * name = calloc(21, 1);
-  printf("Name (<= 20 Characters) Spaces Will Be Replaced With Dash: ");
+  printf("Name (< 20 Characters) Spaces Will Be Replaced With Dash: ");
   fgets(name, 20, stdin);
+  fflush(stdin);
+
+  if (strchr(name, '\n')){
+    *strchr(name, '\n') = 0;
+  }
+
+  name[20] = 0;
 
   int indexx = 0;
   for (indexx = 0; indexx < 20; indexx++){
@@ -21,6 +28,8 @@ int main(int argc, char ** args){
       name[indexx] = '-';
     }
   }
+
+  printf("Welcome, %s\n", name);
 
   mkfifo("display", 0644);
 
@@ -35,6 +44,7 @@ int main(int argc, char ** args){
   socket = client_connect(address);
 
   if (errno || socket < 0){
+    printf("err: %s\n", strerror(errno));
     printf("Error Connecting to Server. If you are not on the same machine as the Server, please run \"./client [SERVER ADDRESS HERE]\", replacing \"SERVER ADDRESS HERE\" with the Server's address and removing the brackets.\n");
     return -1;
   }
@@ -56,7 +66,6 @@ int main(int argc, char ** args){
   fflush(stdin);
 
   int connected = 1;
-  *strchr(name, '\n') = 0;
   write(socket, name, strlen(name));
   printf("Type Your Message: \n");
   while(connected){
